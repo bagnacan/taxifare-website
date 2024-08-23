@@ -1,3 +1,4 @@
+import datetime
 import streamlit as st
 
 '''
@@ -10,17 +11,41 @@ Remember that there are several ways to output content into your web page...
 Either as with the title by just creating a string (or an f-string). Or as with this paragraph using the `st.` functions
 ''')
 
-'''
-## Here we would like to add some controllers in order to ask the user to select the parameters of the ride
+## Add some controllers in order to ask the user to select the parameters for
+# their ride
+#
+# Let's ask for:
+#   - date and time
+#   - pickup longitude
+#   - pickup latitude
+#   - dropoff longitude
+#   - dropoff latitude
+#   - passenger count
 
-1. Let's ask for:
-- date and time
-- pickup longitude
-- pickup latitude
-- dropoff longitude
-- dropoff latitude
-- passenger count
-'''
+# Get date
+pickup_date = st.date_input("Pickup date", value=datetime.date.today())
+
+# Get time
+pickup_time = st.time_input('Pickup time', value=datetime.datetime.now())
+
+# Get pickup latitude
+pickup_latitude = st.number_input('Insert pickup latitude', value=40.783282)
+
+# Get pickup longitude
+pickup_longitude = st.number_input('Insert pickup longitude', value=-73.950655)
+
+# Get dropoff latitude
+dropoff_latitude = st.number_input('Insert dropoff latitude', value=40.769802)
+
+# Get dropoff latitude
+dropoff_longitude = st.number_input('Insert dropoff longitude', value=-73.984365)
+
+# Get passenger count
+passenger_count = st.selectbox(
+    'Number of passengers',
+    list(range(1, 9))
+)
+
 
 '''
 ## Once we have these, let's call our API in order to retrieve a prediction
@@ -46,4 +71,3 @@ if url == 'https://taxifare.lewagon.ai/predict':
 
     ## Finally, we can display the prediction to the user
     '''
-
