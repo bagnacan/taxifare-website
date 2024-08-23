@@ -1,9 +1,15 @@
+'''
+This module implements the TaxiFareModel front
+'''
+
+import json
 import datetime
+import requests
 import streamlit as st
 
-'''
-# TaxiFareModel front
-'''
+
+URL = 'https://taxifare-502551074520.europe-west1.run.app/predict'
+
 
 st.markdown('''
 Remember that there are several ways to output content into your web page...
@@ -47,27 +53,33 @@ passenger_count = st.selectbox(
 )
 
 
-'''
-## Once we have these, let's call our API in order to retrieve a prediction
+## Once the parameters are set, call the API to retrieve a prediction
+if st.button('Predict fare'):
 
-See ? No need to load a `model.joblib` file in this app, we do not even need to know anything about Data Science in order to retrieve a prediction...
+    # Fuild a dictionary containing the parameters for our API
+    params = dict(
+        pickup_datetime=' '.join(
+            [str(pickup_date), str(pickup_time)]),  # e.g., 2014-07-06 19:18:00
+        pickup_longitude=pickup_longitude,
+        pickup_latitude=pickup_latitude,
+        dropoff_longitude=dropoff_longitude,
+        dropoff_latitude=dropoff_latitude,
+        passenger_count=passenger_count)
 
-🤔 How could we call our API ? Off course... The `requests` package 💡
-'''
+    # Call the API
+    try:
+        response = requests.get(URL, params=params, timeout=30)
 
-url = 'https://taxifare.lewagon.ai/predict'
+        if response.status_code == 200:
 
-if url == 'https://taxifare.lewagon.ai/predict':
+            # Retrieve the prediction from the JSON response returned by the API
+            prediction = json.loads(response.content)
 
-    st.markdown('Maybe you want to use your own API for the prediction, not the one provided by Le Wagon...')
+            ## Finally, we can display the prediction to the user
+            fare = round(prediction['fare'], 2)
+            st.text(f"Predicted fare: {fare}$")
 
-    '''
-
-    2. Let's build a dictionary containing the parameters for our API...
-
-    3. Let's call our API using the `requests` package...
-
-    4. Let's retrieve the prediction from the **JSON** returned by the API...
-
-    ## Finally, we can display the prediction to the user
-    '''
+        else:
+            st.text('Could not predict a fare :(')
+    except requests.ReadTimeout:
+        st.text('Could not predict a fare: service is unresponsive :(')
